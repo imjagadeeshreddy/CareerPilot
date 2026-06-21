@@ -10,10 +10,16 @@ class ExperienceEntry(BaseModel):
 
 class ParsedResume(BaseModel):
     raw_text: str = ""
+    name: str = ""
+    email: str = ""
+    phone: str = ""
+    linkedin: str = ""
     skills: list[str] = Field(default_factory=list)
+    skills_section: str = ""
     experience: list[ExperienceEntry] = Field(default_factory=list)
     summary: str = ""
     education: list[str] = Field(default_factory=list)
+    certifications: list[str] = Field(default_factory=list)
 
 
 class JobDescription(BaseModel):
@@ -84,10 +90,16 @@ class OptimizeRequest(BaseModel):
 
 
 class OptimizedResume(BaseModel):
+    name: str = ""
+    email: str = ""
+    phone: str = ""
+    linkedin: str = ""
     summary: str = ""
     skills: list[str] = Field(default_factory=list)
+    skills_section: str = ""
     experience: list[ExperienceEntry] = Field(default_factory=list)
     education: list[str] = Field(default_factory=list)
+    certifications: list[str] = Field(default_factory=list)
     full_text: str = ""
 
 

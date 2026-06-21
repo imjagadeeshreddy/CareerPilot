@@ -244,10 +244,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const el = document.getElementById("resume-preview");
         let html = "";
 
+        const contactParts = [resume.email, resume.phone, resume.linkedin ? `linkedin.com/in/${resume.linkedin}` : ""]
+            .filter(Boolean);
+        if (resume.name || contactParts.length) {
+            html += `<div class="preview-block preview-header">`;
+            if (resume.name) html += `<h5>${escapeHtml(resume.name)}</h5>`;
+            if (contactParts.length) html += `<p>${escapeHtml(contactParts.join(" | "))}</p>`;
+            html += `</div>`;
+        }
+
         if (resume.summary) {
             html += `<div class="preview-block"><h5>Summary</h5><p>${escapeHtml(resume.summary)}</p></div>`;
         }
-        if (resume.skills && resume.skills.length) {
+        if (resume.skills_section) {
+            html += `<div class="preview-block"><h5>Skills</h5><pre class="preview-bullets">${escapeHtml(resume.skills_section)}</pre></div>`;
+        } else if (resume.skills && resume.skills.length) {
             html += `<div class="preview-block"><h5>Skills</h5><p>${escapeHtml(resume.skills.join(", "))}</p></div>`;
         }
         if (resume.experience && resume.experience.length) {
@@ -266,6 +277,13 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<div class="preview-block"><h5>Education</h5><ul>`;
             resume.education.forEach((edu) => {
                 html += `<li>${escapeHtml(edu)}</li>`;
+            });
+            html += `</ul></div>`;
+        }
+        if (resume.certifications && resume.certifications.length) {
+            html += `<div class="preview-block"><h5>Certifications</h5><ul>`;
+            resume.certifications.forEach((cert) => {
+                html += `<li>${escapeHtml(cert)}</li>`;
             });
             html += `</ul></div>`;
         }

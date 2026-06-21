@@ -1,6 +1,6 @@
 import pytest
 
-from app.models.schemas import ExperienceEntry, JobDescription, MatchResult, ParsedResume, UserAnswer
+from app.models.schemas import ExperienceEntry, JobDescription, MatchResult, OptimizedResume, ParsedResume, UserAnswer
 from app.services.resume_optimizer import ResumeOptimizationEngine
 
 
@@ -20,9 +20,18 @@ def sample_resume():
                 company="TechCorp",
                 duration="2020 - Present",
                 description="Built REST APIs",
-            )
+            ),
+            ExperienceEntry(
+                title="Junior Developer",
+                company="OldCorp",
+                duration="2018 - 2020",
+                description="Maintained legacy systems",
+            ),
         ],
         education=["B.S. Computer Science"],
+        certifications=["AWS Certified Developer"],
+        name="John Doe",
+        email="john@example.com",
     )
 
 
@@ -85,7 +94,35 @@ def test_match_score_improves_with_verified_skills(engine, sample_resume, sample
     assert score_after >= sample_match.score
 
 
-def test_preserves_original_experience(engine, sample_resume, sample_job, sample_match):
+def test_preserves_all_original_experience(engine, sample_resume, sample_job, sample_match):
     optimized, _ = engine.optimize(sample_resume, sample_job, sample_match, [])
-    assert len(optimized.experience) >= 1
-    assert optimized.experience[0].company == "TechCorp"
+    assert len(optimized.experience) == 2
+    companies = {entry.company for entry in optimized.experience}
+    assert "TechCorp" in companies
+    assert "OldCorp" in companies
+
+
+def test_preserves_contact_and_certifications(engine, sample_resume, sample_job, sample_match):
+    optimized, _ = engine.optimize(sample_resume, sample_job, sample_match, [])
+    assert optimized.name == "John Doe"
+    assert optimized.email == "john@example.com"
+    assert len(optimized.certifications) == 1
+
+
+def test_merge_restores_missing_ai_jobs(engine, sample_resume, sample_job, sample_match):
+    partial = OptimizedResume(
+        summary="Updated summary",
+        skills=["python"],
+        experience=[
+            ExperienceEntry(
+                title="Software Engineer",
+                company="TechCorp",
+                duration="2020 - Present",
+                description="Rewritten bullet",
+            )
+        ],
+        education=["B.S. Computer Science"],
+    )
+    merged = engine._merge_with_original(partial, sample_resume, [])
+    assert len(merged.experience) == 2
+    assert any(entry.company == "OldCorp" for entry in merged.experience)
