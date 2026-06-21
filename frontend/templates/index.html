@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }} — Career Intelligence</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">{{ app_name }}</h1>
+            <p class="tagline">AI Career Intelligence Platform</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h2>Match, optimize, and download your resume</h2>
+            <p>Upload your resume, paste a job description, answer gap questions, and get an ATS-optimized resume.</p>
+        </section>
+
+        <!-- Step indicators -->
+        <nav id="steps" class="steps hidden">
+            <div class="step step--active" data-step="1"><span>1</span> Analyze</div>
+            <div class="step" data-step="2"><span>2</span> Gap Questions</div>
+            <div class="step" data-step="3"><span>3</span> Optimize &amp; Download</div>
+        </nav>
+
+        <section class="card form-card">
+            <form id="analysis-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="resume">Resume (PDF, DOCX, or TXT)</label>
+                    <input type="file" id="resume" name="resume" accept=".pdf,.docx,.doc,.txt" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="job_description">Job Description</label>
+                    <textarea
+                        id="job_description"
+                        name="job_description"
+                        rows="12"
+                        placeholder="Paste the full job description here..."
+                        required
+                        minlength="20"
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submit-btn">
+                    Analyze Match
+                </button>
+            </form>
+
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p id="loading-text">Analyzing your resume...</p>
+            </div>
+
+            <div id="error" class="error hidden"></div>
+        </section>
+
+        <!-- V1 Results -->
+        <section id="results" class="results hidden">
+            <div class="score-card">
+                <div class="score-ring" id="score-ring">
+                    <span class="score-value" id="score-value">0</span>
+                    <span class="score-label">Match Score</span>
+                </div>
+                <div class="score-meta">
+                    <h3 id="job-title">Job Match Analysis</h3>
+                    <p id="score-summary"></p>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card result-card">
+                    <h4>Matching Skills</h4>
+                    <ul id="matching-skills" class="skill-list skill-list--match"></ul>
+                </div>
+                <div class="card result-card">
+                    <h4>Missing Required Skills</h4>
+                    <ul id="missing-required" class="skill-list skill-list--gap"></ul>
+                </div>
+            </div>
+
+            <div class="card result-card">
+                <h4>Missing Preferred Skills</h4>
+                <ul id="missing-preferred" class="skill-list skill-list--preferred"></ul>
+            </div>
+
+            <div class="card result-card">
+                <h4>Improvement Suggestions</h4>
+                <ul id="suggestions" class="suggestion-list"></ul>
+            </div>
+
+            <div class="card result-card">
+                <h4>Extracted Resume Skills</h4>
+                <ul id="resume-skills" class="skill-list"></ul>
+            </div>
+
+            <button type="button" class="btn-primary btn-secondary-action" id="optimize-btn">
+                Continue to Optimization →
+            </button>
+        </section>
+
+        <!-- V2 Gap Questions -->
+        <section id="gap-section" class="results hidden">
+            <div class="card result-card">
+                <h3 class="section-title">Fill Your Skill Gaps</h3>
+                <p class="section-desc">
+                    Answer only with <strong>verified</strong> experience. We never invent information —
+                    blank answers are fine.
+                </p>
+                <p id="ai-badge" class="ai-badge hidden">Powered by AI</p>
+                <form id="gap-form"></form>
+                <div id="no-gaps" class="empty-state hidden">
+                    <p>Great news — no skill gaps detected. You can proceed directly to optimization.</p>
+                </div>
+                <button type="button" class="btn-primary" id="generate-btn">
+                    Generate Optimized Resume
+                </button>
+            </div>
+        </section>
+
+        <!-- V2 Optimized Results -->
+        <section id="optimized-section" class="results hidden">
+            <div class="score-card">
+                <div class="score-ring" id="ats-ring">
+                    <span class="score-value" id="ats-score">0</span>
+                    <span class="score-label">ATS Score</span>
+                </div>
+                <div class="score-meta">
+                    <h3>Optimized Resume</h3>
+                    <p id="match-improvement"></p>
+                    <p id="ats-summary"></p>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card result-card">
+                    <h4>ATS Matched Keywords</h4>
+                    <ul id="ats-matched" class="skill-list skill-list--match"></ul>
+                </div>
+                <div class="card result-card">
+                    <h4>Missing Keywords</h4>
+                    <ul id="ats-missing" class="skill-list skill-list--gap"></ul>
+                </div>
+            </div>
+
+            <div class="card result-card">
+                <h4>ATS Recommendations</h4>
+                <ul id="ats-recommendations" class="suggestion-list"></ul>
+            </div>
+
+            <div class="card result-card preview-card">
+                <h4>Resume Preview</h4>
+                <div id="resume-preview" class="resume-preview"></div>
+            </div>
+
+            <div class="download-actions">
+                <button type="button" class="btn-primary btn-download" data-format="pdf">
+                    Download PDF
+                </button>
+                <button type="button" class="btn-primary btn-download btn-outline" data-format="docx">
+                    Download DOCX
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{ app_name }}. MVP V2 — Optimization &amp; ATS</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
